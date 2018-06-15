@@ -1,0 +1,24 @@
+{
+  "name": "air-api-gateway",
+  "version": "1.0.0",
+  "description": "Restful APIs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/emanuelef/air-api-gateway.git"
+  },
+  "author": "Emanuele Fumagalli",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/emanuelef/air-api-gateway/issues"
+  },
+  "homepage": "https://github.com/emanuelef/air-api-gateway#readme",
+  "dependencies": {
+    "aws-sdk": "^2.259.1",
+    "dotenv": "^6.0.0",
+    "hapi": "^17.5.1"
+  }
+}
