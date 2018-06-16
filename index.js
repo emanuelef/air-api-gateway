@@ -1,5 +1,6 @@
 'use strict';
 require('dotenv').config();
+const Boom = require('boom');
 
 const {startScanning, startQueryingPromise} = require('./db');
 
@@ -45,14 +46,16 @@ server.route({
     const yesterday = now - 4 * 60 * 60 * 1000;
 
     console.log(now, yesterday);
+    let items = [];
     try {
-      let items = await startQueryingPromise(yesterday, now);
+      items = await startQueryingPromise(yesterday, now);
       console.log('DONE ', items.length);
     } catch (e) {
       console.log(e);
+      throw Boom.teapot(e.message);
     }
 
-    return params;
+    return items;
   }
 });
 
