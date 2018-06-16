@@ -1,4 +1,5 @@
 const AWS = require('aws-sdk');
+const util = require('util');
 
 AWS.config.update({endpoint: 'https://dynamodb.eu-west-2.amazonaws.com', region: 'eu-west-2'});
 
@@ -60,4 +61,61 @@ const startScanning = () => {
   docClient.scan(params, onScan);
 };
 
+const startQuerying = (from, to, callback) => {
+
+  let itemsQuery = [];
+  let numItemsQuery = 0;
+
+  const paramsQuery = {
+    TableName: TABLE,
+    IndexName: "timestamp-index",
+    KeyConditionExpression: "#timestamp BETWEEN :from AND :to",
+    ExpressionAttributeNames: {
+      "#timestamp": "timestamp"
+    },
+    ExpressionAttributeValues: {
+      ":from": from,
+      ":to": to
+    }
+  };
+
+  const runQuery = (callback) => {
+    docClient.query(paramsQuery, (err, result) => {
+      if (err) {
+        console.error('Unable to query the table. Error JSON:', JSON.stringify(err, null, 2));
+        callback(err);
+      } else {
+        console.log('Query succeeded.');
+
+        itemsQuery = itemsQuery.concat(data.Items);
+        numItemsQuery += data.Items.length;
+
+        if (typeof data.LastEvaluatedKey != 'undefined') {
+          console.log('Querying for more...');
+          paramsQuery.ExclusiveStartKey = data.LastEvaluatedKey;
+          runQuery(callback);
+        } else {
+          console.log(`Found ${numItemsQuery} items`);
+          callback(err, itemsQuery);
+        }
+      }
+    });
+  }
+
+  console.log('Querying');
+  runQuery(callback);
+};
+
+const startQueryingPromise = (from, to) => {
+  return new Promise((resolve, reject) => {
+    startQuerying(from, to, (err, data) => {
+      if (err !== null) {
+        return reject(err);
+      }
+      resolve(data);
+    });
+  });
+}
+
 exports.startScanning = startScanning;
+exports.startQueryingPromise = startQueryingPromise;
