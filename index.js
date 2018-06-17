@@ -3,7 +3,7 @@ require('dotenv').config();
 const Boom = require('boom');
 const {startQueryingPromise} = require('./mysql');
 const Hapi = require('hapi');
-const server = Hapi.server({port: 3001, host: 'localhost'});
+const server = Hapi.server({port: process.env.PORT});
 
 const init = async () => {
 
