@@ -69,7 +69,7 @@ const startQuerying = (from, to, callback) => {
   const paramsQuery = {
     TableName: TABLE,
     IndexName: "timestamp-index",
-    KeyConditionExpression: "#timestamp BETWEEN :from AND :to",
+    KeyConditionExpression: "#timestamp BETWEEN :from and :to",
     ExpressionAttributeNames: {
       "#timestamp": "timestamp"
     },
@@ -82,17 +82,17 @@ const startQuerying = (from, to, callback) => {
   const runQuery = (callback) => {
     docClient.query(paramsQuery, (err, result) => {
       if (err) {
-        console.error('Unable to query the table. Error JSON:', JSON.stringify(err, null, 2));
+        //console.error('Unable to query the table. Error JSON:', JSON.stringify(err, null, 2));
         callback(err);
       } else {
         console.log('Query succeeded.');
 
-        itemsQuery = itemsQuery.concat(data.Items);
-        numItemsQuery += data.Items.length;
+        itemsQuery = itemsQuery.concat(result.Items);
+        numItemsQuery += result.Items.length;
 
-        if (typeof data.LastEvaluatedKey != 'undefined') {
+        if (typeof result.LastEvaluatedKey != 'undefined') {
           console.log('Querying for more...');
-          paramsQuery.ExclusiveStartKey = data.LastEvaluatedKey;
+          paramsQuery.ExclusiveStartKey = result.LastEvaluatedKey;
           runQuery(callback);
         } else {
           console.log(`Found ${numItemsQuery} items`);
@@ -115,7 +115,7 @@ const startQueryingPromise = (from, to) => {
       resolve(data);
     });
   });
-}
+};
 
 exports.startScanning = startScanning;
 exports.startQueryingPromise = startQueryingPromise;

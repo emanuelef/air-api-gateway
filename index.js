@@ -1,11 +1,8 @@
 'use strict';
 require('dotenv').config();
 const Boom = require('boom');
-
-const {startScanning, startQueryingPromise} = require('./db');
-
+const {startQueryingPromise} = require('./mysql');
 const Hapi = require('hapi');
-
 const server = Hapi.server({port: 3001, host: 'localhost'});
 
 const init = async () => {
@@ -41,21 +38,20 @@ server.route({
   handler: async (request, h) => {
     const params = request.query
     console.log(params)
-
-    const now = Date.now();
-    const yesterday = now - 4 * 60 * 60 * 1000;
-
+    /*
+    const now = Math.round(Date.now() / 1000);
+    const yesterday = now - 4 * 60 * 60;
     console.log(now, yesterday);
-    let items = [];
+    */
+
     try {
-      items = await startQueryingPromise(yesterday, now);
+      let items = await startQueryingPromise(params.from, params.to);
       console.log('DONE ', items.length);
+      return items;
     } catch (e) {
       console.log(e);
       throw Boom.teapot(e.message);
     }
-
-    return items;
   }
 });
 
