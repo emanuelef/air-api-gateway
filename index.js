@@ -49,7 +49,8 @@ server.route({
       console.log('DONE ', items.length);
       let response = {
         fromDate: new Date(params.from * 1000),
-        toDate: new Date(params.to * 1000)
+        toDate: new Date(params.to * 1000),
+        totalItems: items.length
       };
 
       response.items = items;
