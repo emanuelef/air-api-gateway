@@ -7,7 +7,6 @@ const server = Hapi.server({port: process.env.PORT});
 
 const init = async () => {
 
-  /*
   await server.register({
     plugin: require('hapi-pino'),
     options: {
@@ -15,7 +14,6 @@ const init = async () => {
       logEvents: ['response']
     }
   });
-  */
 
   await server.start();
   console.log(`Server running at: ${server.info.uri}`);
