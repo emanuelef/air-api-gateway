@@ -47,7 +47,14 @@ server.route({
     try {
       let items = await startQueryingPromise(params.from, params.to);
       console.log('DONE ', items.length);
-      return items;
+      let response = {
+        fromDate: new Date(params.from * 1000),
+        toDate: new Date(params.to * 1000)
+      };
+
+      response.items = items;
+
+      return response;
     } catch (e) {
       console.log(e);
       throw Boom.teapot(e.message);
