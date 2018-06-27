@@ -116,4 +116,20 @@ const startQueryingPromise = async (from, to) => {
   });
 };
 
+const startQueryingFlightsPromise = async (from, to) => {
+  return Flights.findAll({
+    attributes: {
+      exclude: [
+        'flyingAtCreation'
+      ]
+    },
+    where: {
+      startTime: {
+        [Op.between]: [from, to]
+      }
+    }
+  });
+};
+
 exports.startQueryingPromise = startQueryingPromise;
+exports.startQueryingFlightsPromise = startQueryingFlightsPromise;
