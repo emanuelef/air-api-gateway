@@ -119,9 +119,7 @@ const startQueryingPromise = async (from, to) => {
 const startQueryingFlightsPromise = async (from, to) => {
   return Flights.findAll({
     attributes: {
-      exclude: [
-        'flyingAtCreation'
-      ]
+      exclude: ['flyingAtCreation']
     },
     where: {
       startTime: {
@@ -131,5 +129,45 @@ const startQueryingFlightsPromise = async (from, to) => {
   });
 };
 
+const startQueryingAllFilteredPromise = async (from, to, lat, lon, maxDistMeters) => {
+  const r_earth = 6371000.0;
+
+  const latDelta = (maxDistMeters / r_earth) * (180 / Math.PI);
+  const fromLat = lat - latDelta;
+  const toLat = lat + latDelta;
+  const lonDelta = (maxDistMeters / r_earth) * (180 / Math.PI) / Math.cos(lat * Math.PI / 180);
+  const fromLon = lon - lonDelta;
+  const toLon = lon + lonDelta;
+
+  console.log(fromLat, toLat);
+  console.log(fromLon, toLon);
+
+  return All.findAll({
+    attributes: {
+      exclude: [
+        'wakeTurbulence',
+        'euclidean',
+        'flying',
+        'aircraftType',
+        'wCompass',
+        'wDeg',
+        'wSpeed'
+      ]
+    },
+    where: {
+      time: {
+        [Op.between]: [from, to]
+      },
+      latitude: {
+        [Op.between]: [fromLat, toLat]
+      },
+      longitude: {
+        [Op.between]: [fromLon, toLon]
+      }
+    }
+  });
+};
+
 exports.startQueryingPromise = startQueryingPromise;
 exports.startQueryingFlightsPromise = startQueryingFlightsPromise;
+exports.startQueryingAllFilteredPromise = startQueryingAllFilteredPromise;

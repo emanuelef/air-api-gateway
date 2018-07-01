@@ -1,12 +1,13 @@
 'use strict';
 require('dotenv').config();
 const Boom = require('boom');
-const {startQueryingPromise, startQueryingFlightsPromise} = require('./mysql');
+const {startQueryingPromise, startQueryingFlightsPromise, startQueryingAllFilteredPromise} = require('./mysql');
 const Hapi = require('hapi');
 const server = Hapi.server({port: process.env.PORT});
 
 const init = async () => {
 
+  /*
   await server.register({
     plugin: require('hapi-pino'),
     options: {
@@ -14,6 +15,7 @@ const init = async () => {
       logEvents: ['response']
     }
   });
+  */
 
   await server.start();
   console.log(`Server running at: ${server.info.uri}`);
@@ -70,6 +72,32 @@ server.route({
 
     try {
       let items = await startQueryingFlightsPromise(params.from, params.to);
+      console.log('DONE ', items.length);
+      let response = {
+        fromDate: new Date(params.from * 1000),
+        toDate: new Date(params.to * 1000),
+        totalItems: items.length
+      };
+
+      response.items = items;
+
+      return response;
+    } catch (e) {
+      console.log(e);
+      throw Boom.teapot(e.message);
+    }
+  }
+});
+
+server.route({
+  method: 'GET',
+  path: '/allInBox',
+  handler: async (request, h) => {
+    const params = request.query;
+    console.log(params);
+
+    try {
+      let items = await startQueryingAllFilteredPromise(params.from, params.to, Number(params.lat), Number(params.lon), Number(params.max));
       console.log('DONE ', items.length);
       let response = {
         fromDate: new Date(params.from * 1000),
