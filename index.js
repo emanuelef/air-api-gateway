@@ -6,7 +6,15 @@ const {
   startQueryingFlightsPromise,
   startQueryingAllFilteredPromise
 } = require('air-commons').mysql;
+
 const Hapi = require('hapi');
+
+const Position = require('air-commons').Position;
+
+const {
+  genFlightsStats
+} = require('./stats/groupFlights');
+
 const server = Hapi.server({
   port: process.env.PORT
 });
@@ -140,14 +148,22 @@ server.route({
 
       console.log(flightsByIcao);
 
-      console.log('DONE ', items.length);
+      const reqPosition = new Position({
+        lat: Number(params.lat),
+        lon: Number(params.lon),
+        alt: 20 // Calculate right one
+      });
+
+      let allSummaries = genFlightsStats(items, reqPosition);
+
+      console.log('DONE ', allSummaries.length);
       let response = {
         fromDate: new Date(params.from * 1000),
         toDate: new Date(params.to * 1000),
-        totalItems: items.length
+        totalItems: allSummaries.length
       };
 
-      response.items = items;
+      response.items = allSummaries;
 
       return response;
     } catch (e) {
